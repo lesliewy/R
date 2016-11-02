@@ -48,23 +48,22 @@ wordFreq1 <- NULL
 
 # BEGIN
 # 生成词云 html.  用 tagxedo 可以在线制作各种形状的词云.
-# filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
-# fileNames <- tk_choose.files(multi = TRUE, filter = filters)
-# for(name in fileNames) {
-#    wordFreq <- read.table(name, header=TRUE);
-#    wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
-#    # 必须在console 中使用才能打开浏览器.
-#    wordcloud2(wordFreq1)
-# }
+ # filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
+ # fileNames <- tk_choose.files(multi = TRUE, filter = filters)
+ # for(name in fileNames) {
+ #    wordFreq <- read.table(name, header=TRUE);
+ #    wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
+ #    # 必须在console 中使用才能打开浏览器.
+ #    wordcloud2(wordFreq1)
+ # }
 # END
 
 
 # BEGIN
 # 全部文本中某个词语出现次数直方图
-filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
-fileNames <- tk_choose.files(multi = TRUE, filter = filters)
-for(name in fileNames) {
-   heatmap(day_m,Rowv=NA,Colv=NA,scale = “column”,col=brewer.pal(4,”Blues”),revC = TRUE)
-
-}
+#filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
+#fileNames <- tk_choose.files(multi = TRUE, filter = filters)
+#for(name in fileNames) {
+#   heatmap(day_m,Rowv=NA,Colv=NA,scale = “column”,col=brewer.pal(4,”Blues”),revC = TRUE)
+#}
 # END

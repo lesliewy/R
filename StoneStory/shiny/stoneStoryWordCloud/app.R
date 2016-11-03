@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(wordcloud2)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -30,17 +31,39 @@ ui <- fluidPage(
      
       # Show a plot of the generated distribution
       mainPanel(
-         plotOutput("distPlot")
+         # plotOutput("distPlot")
+        wordcloud2Output("distPlot", width = "100%", height = "600px")
       )
    )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+
    
-   output$distPlot <- renderPlot({
-      # generate bins based on input$bins from ui.R
-     
+  # filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
+  # fileNames <- tk_choose.files(multi = TRUE, filter = filters)
+  # for(name in fileNames) {
+  #   wordFreq <- read.table(name, header=TRUE);
+  #   wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
+  #   wordcloud2(wordFreq1)
+  # }
+  # 
+
+  
+   # output$distPlot <- renderPlot({
+   #    # generate bins based on input$bins from ui.R
+   # })
+   
+   output$distPlot <- renderWordcloud2({
+     # generate bins based on input$bins from ui.R
+     range <- input$range
+     begin <- range[1]
+     end <- range[2]
+     freqName <- paste("../../freq/", grep(paste("^第", begin, "回", sep=""), list.files("../../freq"), value=TRUE), sep="")
+     wordFreq <- read.table(freqName, header=TRUE);
+     wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
+     wordcloud2(wordFreq1)
    })
 }
 

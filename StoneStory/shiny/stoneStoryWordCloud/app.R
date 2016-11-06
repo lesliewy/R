@@ -9,62 +9,110 @@
 
 library(shiny)
 library(wordcloud2)
+library(hash)
 
 # Define UI for application that draws a histogram
+# begin <- seq(1,80)
+# end <- seq(begin[1],80)
 ui <- fluidPage(
    
    # Application title
    titlePanel("红楼梦词云"),
-   
-   # Sidebar with a slider input for number of bins 
+
    sidebarLayout(
-      # sidebarPanel(
-      #    sliderInput("bins",
-      #                "Number of bins:",
-      #                min = 1,
-      #                max = 50,
-      #                value = 30)
-      # ),
+     sidebarPanel(
+       selectInput("begin", "起始回数:",
+                   choices = seq(1,80)),
+
+       selectInput("end", "结束回数:",
+                   choices = seq(1,80)),
+       
+       selectInput("showwords", "显示词数:",
+                   choices = c(50,100,200,300,500)),
+
+       submitButton("生成词云")
+
+     ),
      
-      sliderInput("range", "Range:",
-                  min = 1, max = 80, value = c(5,40)),
-     
-      # Show a plot of the generated distribution
-      mainPanel(
-         # plotOutput("distPlot")
-        wordcloud2Output("distPlot", width = "100%", height = "600px")
-      )
+     mainPanel(
+       # textOutput("error"),
+       wordcloud2Output("distplot", width = "100%", height = "400px"),
+       tableOutput("head")
+     )
    )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
-   
-  # filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
-  # fileNames <- tk_choose.files(multi = TRUE, filter = filters)
-  # for(name in fileNames) {
-  #   wordFreq <- read.table(name, header=TRUE);
-  #   wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
-  #   wordcloud2(wordFreq1)
-  # }
-  # 
-
+  begininput <- reactive({
+    input$begin
+  })
   
-   # output$distPlot <- renderPlot({
-   #    # generate bins based on input$bins from ui.R
+  endinput <- reactive({
+    input$end
+  })
+  
+  showwords <- reactive({
+    input$showwords
+  })
+  
+  # output$error <- renderText({
+  #   if(begininput() > endinput()){
+  #     print("起始回数不能大于结束回数")
+  #   }else{
+  #     print("")
+  #   }
+  # })
+  
+   output$distplot <- renderWordcloud2({
+     # 这种直接赋值的不能放在外面
+     begin <- input$begin
+     end <- input$end
+     # showwords有问题，第一次正常，改变输入后，无法获取了.
+     showwords <- showwords()
+     print(paste("begin:",begin," end:",end," showwords:", showwords))
+     wordfreqall <- NULL
+     for(i in begin:end){
+       freqname <- paste("../../freq/", grep(paste("^第", i, "回", sep=""), list.files("../../freq"), value=TRUE), sep="")
+       # stringsAsFactors 方便后面处理, 否则has.key()那里报错
+       wordfreq <- read.table(freqname, header=TRUE, stringsAsFactors=FALSE);
+       print(paste(freqname,nrow(wordfreq)))
+       wordfreqall <- rbind(wordfreqall, wordfreq)
+     }
+     print(paste("wordfreqall:", nrow(wordfreqall)))
+     
+     # 不用了这个方法，没办法再将tapply返回的array转成data.frame
+     # wordfreqsum <- tapply(wordfreqall$次数, wordfreqall$词语, sum)
+     
+     h <- hash()
+     for(i in 1:nrow(wordfreqall)){
+       k <- wordfreqall[i, 1]
+       v <- wordfreqall[i, 2]
+       if(has.key(k, h)){
+         .set(h, k, values(h, keys=k) + v)
+       }else{
+         .set(h, k, v)
+       }
+     }
+     words <- keys(h)
+     count <- values(h)
+     wordfreqsum <- data.frame(words, count)
+     
+     wordfreq1 <- wordfreqsum[nchar(as.vector(wordfreqsum[[1]])) > 1, ]
+     print(paste("wordfreq1:", nrow(wordfreq1)))
+     # sort
+     wordfreq2 <- head(wordfreq1[order(wordfreq1[,2], decreasing=T),], n = 100)
+     print(wordfreq2)
+     print(nrow(wordfreq2))
+     wordcloud2(wordfreq2)
+     # 后面不能再有其他表达式
+   })
+   
+   # 不知道怎么获取wordfreq1
+   # output$head <- renderTable({
+   #   head(wordfreq1[order(wordfreq1[,2], decreasing=T),], n=20)
    # })
    
-   output$distPlot <- renderWordcloud2({
-     # generate bins based on input$bins from ui.R
-     range <- input$range
-     begin <- range[1]
-     end <- range[2]
-     freqName <- paste("../../freq/", grep(paste("^第", begin, "回", sep=""), list.files("../../freq"), value=TRUE), sep="")
-     wordFreq <- read.table(freqName, header=TRUE);
-     wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
-     wordcloud2(wordFreq1)
-   })
 }
 
 # Run the application 

@@ -21,11 +21,16 @@ ui <- fluidPage(
 
    sidebarLayout(
      sidebarPanel(
-       selectInput("begin", "起始回数:",
-                   choices = seq(1,80)),
-
-       selectInput("end", "结束回数:",
-                   choices = seq(1,80)),
+       # selectInput("begin", "起始回数:",
+       #             choices = seq(1,80)),
+       # 
+       # selectInput("end", "结束回数:",
+       #             choices = seq(1,80)),
+       
+       # 另一种方式
+       sliderInput("range", "选择范围:",
+                   min = 1, max = 80, value = c(5,10)),
+       
        
        selectInput("showwords", "显示词数:",
                    choices = c(50,100,200,300,500)),
@@ -45,11 +50,11 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   begininput <- reactive({
-    input$begin
+    input$range[1]
   })
   
   endinput <- reactive({
-    input$end
+    input$range[2]
   })
   
   showwords <- reactive({
@@ -66,14 +71,15 @@ server <- function(input, output) {
   
    output$distplot <- renderWordcloud2({
      # 这种直接赋值的不能放在外面
-     begin <- input$begin
-     end <- input$end
+     begin <- begininput()
+     end <- endinput()
      # showwords有问题，第一次正常，改变输入后，无法获取了.
      showwords <- showwords()
      print(paste("begin:",begin," end:",end," showwords:", showwords))
      wordfreqall <- NULL
+     freqdirpath <- "/home/leslie/MyProject/R/StoneStory/freq/"
      for(i in begin:end){
-       freqname <- paste("../../freq/", grep(paste("^第", i, "回", sep=""), list.files("../../freq"), value=TRUE), sep="")
+       freqname <- paste(freqdirpath, grep(paste("^第", i, "回", sep=""), list.files(freqdirpath), value=TRUE), sep="")
        # stringsAsFactors 方便后面处理, 否则has.key()那里报错
        wordfreq <- read.table(freqname, header=TRUE, stringsAsFactors=FALSE);
        print(paste(freqname,nrow(wordfreq)))

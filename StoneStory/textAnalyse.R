@@ -7,6 +7,7 @@ library(Rwordseg)
 library(stringr)
 library(wordcloud2)
 library(tcltk)    # choose.files
+library(hash)
 
 data <- NULL
 wordFreq <- NULL
@@ -24,38 +25,42 @@ wordFreq1 <- NULL
 # BEGIN
 # 统计词频, 生成词频文件 csv格式.  这个单独做.
 # 这里选择的是分词文件. .segment
-# filters <- matrix(c("segemnt file", ".segment.dat", "All files", "*"),2, 2, byrow = TRUE)
-# fileNames <- tk_choose.files(multi = TRUE, filter = filters)
-# for(name in fileNames) {
-#    data <- NULL
-#    wordFreq <- NULL
-#    wordFreq1 <- NULL
-# 
-#    print(name)
-# 
-#    data <- str_trim(c(data, scan(name, what="")))
-#    wordFreq <- sort(table(tolower(data)), decreasing = TRUE)
-# 
-#    filename <- str_match(name, "/dat/.*.dat")
-#    newName <- str_replace(filename, ".segment.dat", ".freq.csv")
-#    newName <- str_replace(newName, "/dat/", "/freq/")
-#    fullName <- str_c("/home/leslie/MyProject/StoneStory", newName)
-#    print(str_c("fullName: ", fullName))
-# 
-#    write.table(wordFreq, file = fullName, append=FALSE, row.names=FALSE, col.names=c("词语", "次数"))
-# }
+filters <- matrix(c("segemnt file", ".segment.dat", "All files", "*"),2, 2, byrow = TRUE)
+fileNames <- tk_choose.files(multi = TRUE, filter = filters)
+for(name in fileNames) {
+   data <- NULL
+   wordFreq <- NULL
+   wordFreq1 <- NULL
+
+   print(name)
+
+   data <- str_trim(c(data, scan(name, what="")))
+   wordFreq <- sort(table(tolower(data)), decreasing = TRUE)
+
+   filename <- str_match(name, "/dat/.*.dat")
+   newName <- str_replace(filename, ".segment.dat", ".freq.csv")
+   newName <- str_replace(newName, "/dat/", "/freq/")
+   # 将回数由汉字转为数字
+   
+   fullName <- str_c("/home/leslie/MyProject/StoneStory", newName)
+   
+   
+   print(str_c("fullName: ", fullName))
+
+   write.table(wordFreq, file = fullName, append=FALSE, row.names=FALSE, col.names=c("词语", "次数"))
+}
 # END
 
 # BEGIN
 # 生成词云 html.  用 tagxedo 可以在线制作各种形状的词云.
- filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
- fileNames <- tk_choose.files(multi = TRUE, filter = filters)
- for(name in fileNames) {
-    wordFreq <- read.table(name, header=TRUE);
-    wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
-    # 必须在console 中使用才能打开浏览器.
-    wordcloud2(wordFreq1)
- }
+ # filters <- matrix(c("freq file", ".freq.csv", "All files", "*"),2, 2, byrow = TRUE)
+ # fileNames <- tk_choose.files(multi = TRUE, filter = filters)
+ # for(name in fileNames) {
+ #    wordFreq <- read.table(name, header=TRUE);
+ #    wordFreq1 <- wordFreq[nchar(as.vector(wordFreq[[1]])) > 1, ]
+ #    # 必须在console 中使用才能打开浏览器.
+ #    wordcloud2(wordFreq1)
+ # }
 # END
 
 

@@ -5,9 +5,10 @@
 library(rJava)
 library(Rwordseg)
 library(stringr)
+library(stringi)
 library(wordcloud2)
 library(tcltk)    # choose.files
-library(hash)
+source("/home/leslie/MyProject/R/utils/util.R")
 
 data <- NULL
 wordFreq <- NULL
@@ -38,16 +39,18 @@ for(name in fileNames) {
    wordFreq <- sort(table(tolower(data)), decreasing = TRUE)
 
    filename <- str_match(name, "/dat/.*.dat")
-   newName <- str_replace(filename, ".segment.dat", ".freq.csv")
-   newName <- str_replace(newName, "/dat/", "/freq/")
+   newname <- str_replace(filename, ".segment.dat", ".freq.csv")
+   newname <- str_replace(newname, "/dat/", "/freq/")
    # 将回数由汉字转为数字
+   chinese <- str_match(newname, "第(.*)回_")[2]
+   if(!is.na(chinese)){
+     trans2digit <- Chinese2Digits(chinese)
+     newname <- str_replace(newname, chinese, trans2digit)
+   }
    
-   fullName <- str_c("/home/leslie/MyProject/StoneStory", newName)
-   
-   
+   fullName <- str_c("/home/leslie/MyProject/R/StoneStory", newname)
    print(str_c("fullName: ", fullName))
-
-   write.table(wordFreq, file = fullName, append=FALSE, row.names=FALSE, col.names=c("词语", "次数"))
+   write.table(wordFreq, file = fullName, append = FALSE, row.names=FALSE, col.names=c("词语", "次数"))
 }
 # END
 

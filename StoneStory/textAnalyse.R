@@ -5,7 +5,6 @@
 library(rJava)
 library(Rwordseg)
 library(stringr)
-library(stringi)
 library(wordcloud2)
 library(tcltk)    # choose.files
 source("/home/leslie/MyProject/R/utils/util.R")
@@ -29,11 +28,10 @@ wordFreq1 <- NULL
 filters <- matrix(c("segemnt file", ".segment.dat", "All files", "*"),2, 2, byrow = TRUE)
 fileNames <- tk_choose.files(multi = TRUE, filter = filters)
 for(name in fileNames) {
+  print(name)
    data <- NULL
    wordFreq <- NULL
    wordFreq1 <- NULL
-
-   print(name)
 
    data <- str_trim(c(data, scan(name, what="")))
    wordFreq <- sort(table(tolower(data)), decreasing = TRUE)

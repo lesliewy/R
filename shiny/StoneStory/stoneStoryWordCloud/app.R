@@ -6,7 +6,8 @@
 #
 #    http://shiny.rstudio.com/
 #
-source("/home/leslie/MyProject/R/shiny/StoneStory/stoneStoryWordCloud/util.R")
+#source("/home/leslie/MyProject/R/shiny/StoneStory/stoneStoryWordCloud/util.R")
+source("util.R")
 
 library(shiny)
 library(wordcloud2)
@@ -65,8 +66,9 @@ server <- function(input, output) {
     input$type
   })
   
+  # 这里被多次wordfreq(), 但是触发getWords()只有第一次
   wordfreq <- reactive({
-    GetWords(begininput(), input$range[2], input$showwords, type())
+    getWords(begininput(), input$range[2], input$showwords, type())
   })
   
    output$distplot <- renderWordcloud2({

@@ -1,6 +1,6 @@
 library(hash)
 
-getWords <- function (begin, end, showwords, type) {
+GetWords <- function (begin, end, showwords, type) {
   # character类型, 必须转换
   showwords <- as.integer(showwords)
   print(paste("begin:", begin," end:",end," showwords:", showwords, "type:", type))
@@ -38,7 +38,7 @@ getWords <- function (begin, end, showwords, type) {
   # 过滤掉一个字的
   wordfreq1 <- wordfreqsum[nchar(as.vector(wordfreqsum[[1]])) > 1, ]
   if(type == "person"){
-    all <- getPersons()
+    all <- GetPersons()
     # 使用which过滤，all必须是list
     wordfreq1 <- wordfreq1[which(wordfreq1$words %in% all), ]
   }
@@ -47,7 +47,7 @@ getWords <- function (begin, end, showwords, type) {
   return(wordfreq2)
 }
 
-getPersons <- function(){
+GetPersons <- function(){
   data <- read.table("/home/leslie/MyProject/R/StoneStory/dicts/人名.txt", col.names = "name", header = FALSE, stringsAsFactors = FALSE)
   list <- as.list(data$name)
   return(list)

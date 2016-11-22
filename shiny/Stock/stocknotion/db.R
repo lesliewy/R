@@ -49,7 +49,7 @@ stockNotionQuery <- function(code, begindate, enddate){
 indexQuery <- function(code, begindate, enddate){
   print("this is in indexQuery()")
   conn <- getConn();
-  sql <- paste("SELECT TRADE_DATE, CHANGE_PCT FROM ST_INDEX WHERE INDEX_CODE='", code, "' AND TRADE_DATE >='",begindate, "' AND TRADE_DATE <= '", enddate, "'", sep = "")
+  sql <- paste("SELECT INDEX_NAME, TRADE_DATE, CHANGE_PCT FROM ST_INDEX WHERE INDEX_CODE='", code, "' AND TRADE_DATE >='",begindate, "' AND TRADE_DATE <= '", enddate, "'", sep = "")
   sqlresult <- dbGetQuery(conn, sql); 
   result <- data.frame(sqlresult, stringsAsFactors = False);
   
@@ -58,6 +58,7 @@ indexQuery <- function(code, begindate, enddate){
 }
 
 notionQuery <- function(begindate, enddate){
+  print("this is in notionQuery()")
   conn <- getConn()
   sql <- paste(" SELECT NOTION_NAME, TRADE_DATE, CHANGE_PCT FROM ST_NOTION_HOT ",
                " WHERE TRADE_DATE >= '", begindate, "' AND TRADE_DATE <= '", enddate, "' ORDER BY NOTION_NAME, TRADE_DATE", sep = "")

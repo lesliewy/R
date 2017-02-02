@@ -9,6 +9,7 @@ allCates <- c("先秦", "汉朝", "魏晋", "南北朝", "隋朝", "唐朝", "�
 getConn <- function(){
   #本地连接，不要参数
   con <- mongo.create()
+  #con <- mongo.create(username = "poetry", password = "poetry123", db="admin")
   print(paste("mongo connected: ", mongo.is.connected(con)))
   return(con);
 }
@@ -40,6 +41,11 @@ categoryAuthorsQuery <- function(){
   result <- result[order(o), ]
   
   closeConn(conn)
+  # 添加总共
+  d1 <- data.frame(categoryname=c("总共"), totalauthors=c(sum(result$totalauthors)))
+  result <- rbind(result, d1)
+  # 显示行号，不显示其他的
+  row.names(result) <- NULL
   return(result)
 }
 
@@ -61,6 +67,11 @@ categoryPoemsQuery <- function(){
   result <- result[order(o), ]
   
   closeConn(conn)
+  # 添加总共
+  d1 <- data.frame(categoryname=c("总共"), totalpoems=c(sum(result$totalpoems)))
+  result <- rbind(result, d1)
+  # 显示行号，不显示其他的
+  row.names(result) <- NULL
   return(result)
 }
 

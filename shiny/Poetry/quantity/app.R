@@ -14,13 +14,21 @@ library(DT)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  plotOutput("distplot1"),
+  titlePanel("诗人数、诗词数统计"),
+  tabsetPanel(type = "tabs",
+              tabPanel("诗人数 & 诗词数", plotOutput("authorsAndsPoemPlot")),
+              tabPanel("诗人数",  DT::dataTableOutput("authorsTable")),
+              tabPanel("诗词数",  DT::dataTableOutput("poemsTable"))
+  ),
+  hr(),
+  titlePanel("诗人的诗词数统计"),
   fluidRow(
-    hr(),
     selectInput('incategories', '选择年代', category.name, multiple=TRUE, selectize=TRUE, selected='唐朝')
   ),
-  plotOutput("distplot2"),
-  DT::dataTableOutput("table1")
+  tabsetPanel(type = "tabs",
+              tabPanel("图", plotOutput("authorPoemsPlot")),
+              tabPanel("表格",  DT::dataTableOutput("authorPoemsTable"))
+  )
 )
 
 # Define server logic required to draw a histogram
@@ -33,11 +41,17 @@ server <- function(input, output) {
     authorPoemsByCate(incategories())
   })
   
-  output$distplot1 <- renderPlot({
-    print("a")
-    
-    authorsdata <- categoryAuthorsQuery()
-    poemsdata <- categoryPoemsQuery()
+  categoryAuthorsData <- reactive({
+    categoryAuthorsQuery()
+  })
+  
+  categoryPoemsData <- reactive({
+    categoryPoemsQuery()
+  })
+  
+  output$authorsAndsPoemPlot <- renderPlot({
+    authorsdata <- categoryAuthorsData()
+    poemsdata <- categoryPoemsData()
     
     categories <- as.vector(authorsdata$categoryname)
     totalauthors <- as.vector(authorsdata$totalauthors)
@@ -46,6 +60,7 @@ server <- function(input, output) {
     # c("先秦", "汉朝", "魏晋", "南北朝", "隋朝", "唐朝", "宋朝", "金朝", "辽朝","元朝", "明朝", "清朝", "近当代")
     categories1 <- c("XQ", "Han", "WJ", "NB", "Sui", "Tang", "Song")
     title <- "Authors of Category"
+    #title <- "按朝代统计诗人数、诗词数"
     # colors <- rainbow(length(totalauthors))
     
     # 不适宜用饼图，数据差异太大
@@ -67,7 +82,15 @@ server <- function(input, output) {
     box()
   })
   
-  output$distplot2 <- renderPlot({
+  output$authorsTable <-  DT::renderDataTable(DT::datatable({
+    data <- categoryAuthorsData()
+  }))
+
+  output$poemsTable <-  DT::renderDataTable(DT::datatable({
+    data <- categoryPoemsData()
+  }))
+  
+  output$authorPoemsPlot <- renderPlot({
     data <- authorPoemsData()
     numofpoems <- as.vector(data$numofpoems)
     authornames <- as.vector(data$authorname)
@@ -79,7 +102,7 @@ server <- function(input, output) {
     box()
   })
   
-  output$table1 <-  DT::renderDataTable(DT::datatable({
+  output$authorPoemsTable <-  DT::renderDataTable(DT::datatable({
     data <- authorPoemsData()
   }))
 }

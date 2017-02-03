@@ -47,8 +47,8 @@ server <- function(input, output) {
   
   categoryPoemsData <- reactive({
     categoryPoemsQuery()
-  })
-  
+  }) 
+ 
   output$authorsAndsPoemPlot <- renderPlot({
     authorsdata <- categoryAuthorsData()
     poemsdata <- categoryPoemsData()
